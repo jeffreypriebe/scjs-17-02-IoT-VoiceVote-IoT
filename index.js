@@ -2,7 +2,8 @@ var five = require('johnny-five'),
 	Edison = require('edison-io'),
 	scroll = require('lcd-scrolling')
 	io = require('socket.io-client'),
-	Messages = require('./messages')
+	Messages = require('./messages'),
+	doubleTap = require('./doubleTap')
 	;
 
 var board = new five.Board({
@@ -37,12 +38,6 @@ board.on('ready', function() {
 		function(message) { scroll.line(0, message); }		// Display Long
 	);
 	
-	var respond = function(response) {	
-		socket.emit('message', { message: response });
-		
-		messages.nextMessage();
-	}
-	
 	const socket = io('ws://192.168.1.45:30809', {
 		transports: ['websocket'],
 		jsonp: false
@@ -60,19 +55,17 @@ board.on('ready', function() {
 		messages.nextMessage();
 	});
 	
-	var touched;
+	var respond = function(response) {	
+		socket.emit('message', { message: response });
+		messages.nextMessage();
+	}
+	var double = doubleTap(
+		function() { respond('👍'); },
+		function() { respond('👎'); }
+	);
 	touch.on('release', function() {
 		if (!messages.hasMessages()) return;
-		if (touched) {
-			clearTimeout(touched);
-			touched = undefined;
-			respond('👎');
-		} else {
-			touched = setTimeout(function() {
-				touched = undefined;
-				respond('👍');
-			}, 250);
-		}
+		double();
 	});
 	
 	socket.connect();
