@@ -2,6 +2,7 @@ var five = require('johnny-five'),
 	Edison = require('edison-io'),
 	scroll = require('lcd-scrolling')
 	io = require('socket.io-client'),
+	dw = require('diceware'),
 	Messages = require('./messages'),
 	doubleTap = require('./doubleTap')
 	;
@@ -42,9 +43,10 @@ board.on('ready', function() {
 		transports: ['websocket'],
 		jsonp: false
 	});
+	var roomName = dw(1);
 	socket.on('connect', function () {
-		socket.emit('join', { name: 'test' });
-		lcd.clear();
+		socket.emit('join', { name: roomName });
+		lcd.clear().print('> ' + roomName);
 	});
 	socket.on('message', function(data) {
 		messages.receive(data.message);
