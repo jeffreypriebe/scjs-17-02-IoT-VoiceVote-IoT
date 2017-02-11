@@ -18,7 +18,8 @@ board.on('ready', function() {
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
   });
-	var motor = require('./motor')();
+	// var motor = require('./motor')();
+	var motor = { forward: function(){}, backward: function() {}, quit: function(){} };
 	
 	scroll.setup({
 		lcd: lcd,
@@ -62,7 +63,7 @@ board.on('ready', function() {
 		function() { respond('👎'); }
 	);
 	touch.on('release', function() {
-		if (!messages.hasMessages()) return;
+		if (messages.hasMessages()) return;
 		double();
 	});
 	
