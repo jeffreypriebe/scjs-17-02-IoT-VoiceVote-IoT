@@ -19,6 +19,8 @@ board.on('ready', function() {
     controller: 'JHD1313M1'
   });
 	
+	var button = new five.Button(3);
+	
 	scroll.setup({
 		lcd: lcd,
 		firstCharPauseDuration: 2000,
@@ -27,6 +29,15 @@ board.on('ready', function() {
 	});
 	
 	lcd.on().bgColor('#cccccc').print('Starting...');
+	
+	var displayMessage = function() {
+		var message = messages[0];
+
+		lcd.clear();
+		scroll.clear();
+		if (message.length > 16) scroll.line(0, message);
+		else lcd.print(message);
+	}
 	
 	const socket = io('ws://192.168.1.45:30809', {
 		transports: ['websocket'],
@@ -41,16 +52,22 @@ board.on('ready', function() {
 		messages.push(message);
 		messageLed.on();
 
-		lcd.clear();
-		scroll.clear();
-		if (message.length > 16) scroll.line(0, message);
-		else lcd.print(message);
+		if (messages.length === 1) displayMessage();
 	});
-	socket.connect();
 	
-	setTimeout(function() {
-		messageLed.off();
-	}, 500);
+	button.on('release', function() {
+		if (messages.length === 0) return;
+		
+		messages.pop();
+		if (messages.length > 0) displayMessage();
+		else {
+			lcd.clear();
+			scroll.clear();
+			messageLed.off();
+		}
+	});
+	
+	socket.connect();
 	
 	board.on('warn', function(event) {
 		if (event.class === 'Board' && event.message === 'Closing.') {
