@@ -1,15 +1,14 @@
 var five = require('johnny-five'),
 	Edison = require('edison-io'),
 	scroll = require('lcd-scrolling')
-	io = require('socket.io-client')
+	io = require('socket.io-client'),
+	Messages = require('./messages')
 	;
 
 var board = new five.Board({
 	io: new Edison(),
 	repl: false,
 });
-
-var messages = [];
 
 board.on('ready', function() {
 	var messageLed = new five.Led(4);
@@ -29,30 +28,19 @@ board.on('ready', function() {
 	
 	lcd.on().bgColor('#cccccc').print('Starting...');
 	
-	var displayMessage = function() {
-		var message = messages[0];
-
-		lcd.clear();
-		scroll.clear();
-		if (message.length > 16) scroll.line(0, message);
-		else lcd.print(message);
-	}
-	var nextMessage = function() {
-		if (messages.length === 0) return;
-		
-		messages.splice(0, 1);
-		if (messages.length > 0) displayMessage();
-		else {
-			lcd.clear();
-			scroll.clear();
-			messageLed.off();
-			motor.backward();
-		}
-	}
+	var messages = new Messages(
+		function() { lcd.clear(); scroll.clear(); }, 					// Clear
+		// function() { messageLed.off(); motor.backward(); }, 	// Empty
+		// function() { motor.forward(); messageLed.on(); },	// Fist Message
+		function() { messageLed.on(); },	// Fist Message
+		function(message) { lcd.print(message); },				// Display
+		function(message) { scroll.line(0, message); }		// Display Long
+	);
+	
 	var respond = function(response) {	
 		socket.emit('message', { message: response });
 		
-		nextMessage();
+		messages.nextMessage();
 	}
 	
 	const socket = io('ws://192.168.1.45:30809', {
@@ -65,15 +53,11 @@ board.on('ready', function() {
 	});
 	socket.on('message', function(data) {
 		var message = data.message;
-		if (messages.length === 0) motor.forward();
-		messages.push(message);
-		messageLed.on();
-
-		if (messages.length === 1) displayMessage();
+		messages.receive(message);
 	});
 	
 	button.on('release', function() {
-		nextMessage();
+		messages.nextMessage();
 	});
 	
 	var touched;
