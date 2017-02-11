@@ -18,7 +18,7 @@ board.on('ready', function() {
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
   });
-	var motor = require('./motor.js')();
+	var motor = require('./motor')();
 	
 	scroll.setup({
 		lcd: lcd,
@@ -30,12 +30,11 @@ board.on('ready', function() {
 	lcd.on().bgColor('#cccccc').print('Starting...');
 	
 	var messages = new Messages(
-		function() { lcd.clear(); scroll.clear(); }, 					// Clear
-		// function() { messageLed.off(); motor.backward(); }, 	// Empty
-		// function() { motor.forward(); messageLed.on(); },	// Fist Message
-		function() { messageLed.on(); },	// Fist Message
-		function(message) { lcd.print(message); },				// Display
-		function(message) { scroll.line(0, message); }		// Display Long
+		function() { lcd.clear(); scroll.clear(); }, 				// Clear
+		function() { messageLed.off(); motor.backward(); }, // Empty
+		function() { motor.forward(); messageLed.on(); },		// Fist Message
+		function(message) { lcd.print(message); },					// Display
+		function(message) { scroll.line(0, message); }			// Display Long
 	);
 	
 	const socket = io('ws://192.168.1.45:30809', {
@@ -47,8 +46,7 @@ board.on('ready', function() {
 		lcd.clear();
 	});
 	socket.on('message', function(data) {
-		var message = data.message;
-		messages.receive(message);
+		messages.receive(data.message);
 	});
 	
 	button.on('release', function() {
@@ -74,6 +72,7 @@ board.on('ready', function() {
 		if (event.class === 'Board' && event.message === 'Closing.') {
 			lcd.bgColor('#000000').off();
 			messageLed.off();
+			motor.quit();
 		}
 	});
 });
