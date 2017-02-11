@@ -1,8 +1,8 @@
 var five = require('johnny-five'),
-	Edison = require('edison-io')
+	Edison = require('edison-io'),
+	scroll = require('lcd-scrolling')
 	;
 
-// window.navigator.userAgent = 'react-native';
 var io = require('socket.io-client');
 
 var board = new five.Board({
@@ -16,8 +16,15 @@ board.on('ready', function() {
 	var messageLed = new five.Led(4);
 	
   var lcd = new five.LCD({
-    controller: "JHD1313M1"
+    controller: 'JHD1313M1'
   });
+	
+	scroll.setup({
+		lcd: lcd,
+		firstCharPauseDuration: 2000,
+		lastCharPauseDuration: 750,
+		scrollingDuration: 150
+	});
 	
 	lcd.on().bgColor('#cccccc').print('Starting...');
 	
@@ -33,7 +40,11 @@ board.on('ready', function() {
 		var message = data.message;
 		messages.push(message);
 		messageLed.on();
-		lcd.clear().print(message);
+
+		lcd.clear();
+		scroll.clear();
+		if (message.length > 16) scroll.line(0, message);
+		else lcd.print(message);
 	});
 	socket.connect();
 	
