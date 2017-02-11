@@ -16,7 +16,7 @@ Messages.prototype.showMessage = function () {
 	var display = message.length > 16 ? this.displayMessageLong : this.displayMessage;
 
 	this.clear();
-	display(message);
+	setImmediate(function() { display(message); });
 }
 
 Messages.prototype.nextMessage = function () {
