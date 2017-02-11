@@ -70,9 +70,9 @@ board.on('ready', function() {
 	
 	board.on('warn', function(event) {
 		if (event.class === 'Board' && event.message === 'Closing.') {
+			motor.quit();
 			lcd.bgColor('#000000').off();
 			messageLed.off();
-			motor.quit();
 		}
 	});
 });
