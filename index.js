@@ -62,7 +62,7 @@ board.on('ready', function() {
 	
 	var touched;
 	touch.on('release', function() {
-		if (messages.length === 0) return;
+		if (!messages.hasMessages()) return;
 		if (touched) {
 			clearTimeout(touched);
 			touched = undefined;

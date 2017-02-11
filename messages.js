@@ -7,6 +7,10 @@ function Messages(clear, empty, firstMessage, displayMessage, displayMessageLong
 	this.displayMessageLong = displayMessageLong;
 }
 
+Messages.prototype.hasMessages = function () {
+	return this.messages.length > 0;
+}
+
 Messages.prototype.showMessage = function () {
 	var message = this.messages[0];
 	var display = message.length > 16 ? this.displayMessageLong : this.displayMessage;
