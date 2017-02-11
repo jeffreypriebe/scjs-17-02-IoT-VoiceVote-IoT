@@ -1,9 +1,8 @@
 var five = require('johnny-five'),
 	Edison = require('edison-io'),
 	scroll = require('lcd-scrolling')
+	io = require('socket.io-client')
 	;
-
-var io = require('socket.io-client');
 
 var board = new five.Board({
 	io: new Edison(),
@@ -19,6 +18,7 @@ board.on('ready', function() {
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
   });
+	var motor = require('./motor.js')();
 	
 	scroll.setup({
 		lcd: lcd,
@@ -40,12 +40,13 @@ board.on('ready', function() {
 	var nextMessage = function() {
 		if (messages.length === 0) return;
 		
-		messages.pop();
+		messages.splice(0, 1);
 		if (messages.length > 0) displayMessage();
 		else {
 			lcd.clear();
 			scroll.clear();
 			messageLed.off();
+			motor.backward();
 		}
 	}
 	var respond = function(response) {	
@@ -64,6 +65,7 @@ board.on('ready', function() {
 	});
 	socket.on('message', function(data) {
 		var message = data.message;
+		if (messages.length === 0) motor.forward();
 		messages.push(message);
 		messageLed.on();
 
