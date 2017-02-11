@@ -14,12 +14,11 @@ var messages = [];
 
 board.on('ready', function() {
 	var messageLed = new five.Led(4);
-	
+	var button = new five.Button(3);
+	var touch = new five.Button(2);
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
   });
-	
-	var button = new five.Button(3);
 	
 	scroll.setup({
 		lcd: lcd,
@@ -37,6 +36,22 @@ board.on('ready', function() {
 		scroll.clear();
 		if (message.length > 16) scroll.line(0, message);
 		else lcd.print(message);
+	}
+	var nextMessage = function() {
+		if (messages.length === 0) return;
+		
+		messages.pop();
+		if (messages.length > 0) displayMessage();
+		else {
+			lcd.clear();
+			scroll.clear();
+			messageLed.off();
+		}
+	}
+	var respond = function(response) {	
+		socket.emit('message', { message: response });
+		
+		nextMessage();
 	}
 	
 	const socket = io('ws://192.168.1.45:30809', {
@@ -56,14 +71,20 @@ board.on('ready', function() {
 	});
 	
 	button.on('release', function() {
-		if (messages.length === 0) return;
-		
-		messages.pop();
-		if (messages.length > 0) displayMessage();
-		else {
-			lcd.clear();
-			scroll.clear();
-			messageLed.off();
+		nextMessage();
+	});
+	
+	var touched;
+	touch.on('release', function() {
+		if (touched) {
+			clearTimeout(touched);
+			touched = undefined;
+			respond('👎');
+		} else {
+			touched = setTimeout(function() {
+				touched = undefined;
+				respond('👍');
+			}, 250);
 		}
 	});
 	
