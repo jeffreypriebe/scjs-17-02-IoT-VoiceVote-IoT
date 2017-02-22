@@ -7,6 +7,8 @@ var five = require('johnny-five'),
 	doubleTap = require('./doubleTap')
 	;
 
+var ENABLE_MOTOR = false;	// Enables the stepper motor
+
 var board = new five.Board({
 	io: new Edison(),
 	repl: false,
@@ -19,8 +21,7 @@ board.on('ready', function() {
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
   });
-	// var motor = require('./motor')();
-	var motor = { forward: function(){}, backward: function() {}, quit: function(){} };
+	var motor = ENABLE_MOTOR ? require('./motor')() : { forward: function(){}, backward: function() {}, quit: function(){} };
 	
 	scroll.setup({
 		lcd: lcd,
@@ -43,7 +44,8 @@ board.on('ready', function() {
 		transports: ['websocket'],
 		jsonp: false
 	});
-	var roomName = dw(1);
+
+	var roomName = dw(1);	// Select a random name for the socket "room"
 	socket.on('connect', function () {
 		socket.emit('join', { name: roomName });
 		lcd.clear().print('> ' + roomName);
@@ -52,6 +54,7 @@ board.on('ready', function() {
 		messages.receive(data.message);
 	});
 	
+	// On button release, clear the current message, display next message (if any)
 	button.on('release', function() {
 		messages.nextMessage();
 	});
@@ -64,15 +67,16 @@ board.on('ready', function() {
 		function() { respond('👍'); },
 		function() { respond('👎'); }
 	);
+	// On touch button, respond
 	touch.on('release', function() {
-		if (messages.hasMessages()) return;
+		if (!messages.hasMessages()) return;	// Can only respond to a displayed message
 		double();
 	});
 	
 	socket.connect();
 	
 	board.on('warn', function(event) {
-		if (event.class === 'Board' && event.message === 'Closing.') {
+		if (event.class === 'Board' && event.message === 'Closing.') {	// This is the shutdown of the edison. 
 			motor.quit();
 			lcd.bgColor('#000000').off();
 			messageLed.off();
