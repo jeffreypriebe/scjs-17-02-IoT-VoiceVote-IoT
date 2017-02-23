@@ -7,7 +7,8 @@ var five = require('johnny-five'),
 	doubleTap = require('./doubleTap')
 	;
 
-var ENABLE_MOTOR = false;	// Enables the stepper motor
+var ENABLE_MOTOR = false;													// Enables the stepper motor
+var SERVER = 'https://voicevote.jeffreypriebe.com';	// Socket server to recieve messages
 
 var board = new five.Board({
 	io: new Edison(),
@@ -40,8 +41,9 @@ board.on('ready', function() {
 		function(message) { scroll.line(0, message); }			// Display Long
 	);
 	
-	const socket = io('ws://192.168.1.45:30809', {
-		transports: ['websocket'],
+	const socket = io(SERVER, {
+		secure: true,
+		// transports: ['websocket'],
 		jsonp: false
 	});
 
