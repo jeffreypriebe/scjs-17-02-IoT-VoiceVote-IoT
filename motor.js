@@ -15,7 +15,7 @@ module.exports = function () {
 	};
 	
 	motor.backward = function(quarterSteps) {
-		move(Uln200xa_lib.ULN200XA_DIR_CCW, quarterSteps);
+		move(Uln200xa_lib.ULN200XA_DIR_CW, quarterSteps);
 	}
 
 	motor.stop = function () {

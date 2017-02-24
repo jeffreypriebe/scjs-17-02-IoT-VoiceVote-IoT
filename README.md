@@ -9,9 +9,9 @@ This is part of the VoiceVote app which includes:
 
 The app expects:
 
-1. An LED at D4
+1. An LED at D3
 2. An LCD display at any I2C
-3. A button at D3
+3. A button at D4
 4. A button (touch) at D2
 5. Optionally, the Grove Stepper Motor connected. (See [Note on the Stepper Motor below](#note-on-the-stepper-motor).)
 
@@ -45,6 +45,9 @@ Once you have it up and running, some ideas for changing it:
 * Add an additional LED to indicate when there is a connected client in the socket room.
   * An advanced usage would require running the server locally and adding an additional socket message that is sent on every connection.
   * You could also blink the LED to correspond to the number of connected devices.
+* Add a speaker and have the local IoT speak the message (either recorded, or from the text - maybe using [TTS like AWS Polly](https://aws.amazon.com/polly/developers/)).
+* When a "reply" is sent, briefly show the reply (thumbs up or down) on the LED before sending.
+* Send the message response _before_ the synchornous motor movement (this really should be changed).
 * Add some of the [other sensors in the kit](http://johnny-five.io/news/intel-edison-+-grove-iot-kit-examples/).
 
 ## Note on the Stepper Motor

@@ -16,8 +16,8 @@ var board = new five.Board({
 });
 
 board.on('ready', function() {
-	var messageLed = new five.Led(4);
-	var button = new five.Button(3);
+	var messageLed = new five.Led(3);
+	var button = new five.Button(4);
 	var touch = new five.Button(2);
   var lcd = new five.LCD({
     controller: 'JHD1313M1'
