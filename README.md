@@ -58,3 +58,7 @@ It is a bit more advanced to use and requires installing packages in addition to
 [jsupm_uln200xa](https://www.npmjs.com/package/jsupm_uln200xa) ([main repo](https://github.com/intel-iot-devkit/upm))
 
 You can install both of these via npm, see [notes here](https://github.com/intel-iot-devkit/upm/blob/master/docs/installing.md#nodejs-bindings-only-npm). It is recommended to install each sequentially (mraa first) and globally.
+
+---
+
+Built to demo at [Santa Cruz JavaScript meetup Feb 2017](https://www.meetup.com/santacruzjs/events/237562789/).
